@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!--- Files CSS -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="framework.css">
+    <title>Shipping System</title>
+</head>
+<body class="center-flex">
+    <div class="container" id="container">
+        <!--- Start Sign Up Form -->
+        <div class="form-container sign-up tr-6s w-50">
+            <form class="center-flex">
+                <h1>Create Account</h1>
+                
+                <span class="fs-14">or use your email for registration</span>
+                <input class="fs-14" type="text" placeholder="First Name" required>
+                <input class="fs-14" type="text" placeholder="Last Name" required>
+                <input class="fs-14" type="email" placeholder="Email" required>
+                <input class="fs-14" type="tel" placeholder="Phone" required>
+                <input class="fs-14" type="password" placeholder="Password" required id="signupPassword">
+                <input class="fs-14" type="password" placeholder="Confirm Password" required id="confirmPassword">
+                
+                <div class="role-selection w-100">
+                    <select class="fs-14 form-select" required id="roleSelect">
+                        <option value="" disabled selected>Select Role</option>
+                        <option value="seller">Seller</option>
+                    </select>
+                </div>
+                
+                <button class="fs-14" type="button" id="signupBtn">Sign Up</button>
+            </form>
+        </div>
+        <!--- End Sign Up Form -->
+        <!--- Start Sign In Form -->
+        <div class="form-container sign-in w-50">
+            <form class="center-flex">
+                <h1>Sign In</h1>    
+                <span class="fs-14">or use your email & password</span>
+                <input class="fs-14" type="email" placeholder="Email" required id="loginEmail">
+                <input class="fs-14" type="password" placeholder="Password" required id="loginPassword">
+                
+                <div class="role-selection w-100">
+                    <select class="fs-14 form-select" required id="loginRoleSelect">
+                        <option value="" disabled selected>Select Role</option>
+                        <option value="admin">Admin</option>
+                        <option value="seller">Seller</option>
+                        <option value="agent">Agent</option>
+                    </select>
+                </div>
+                
+                <a href="" class="forget fs-14">Forgot your password?</a>
+                <button class="fs-14" type="button" id="signinBtn">Sign In</button>
+            </form>
+        </div>
+        <!--- End Sign In Form -->
+            <div class="toggle-container tr-6s w-50">
+                <div class="toggle tr-6s" >
+                    <!--- Start toggle left -->
+                    <div class="toggle-panel toggle-left center-flex tr-6s w-50">
+                        <h1>Welcome Back</h1>
+                        <p class="fs-14">Enter your personal details to use all shipping system features</p>
+                        <button class="hidden fs-14" id="login">SIGN IN</button>
+                    </div>
+                    <!--- End toggle left -->
+                    <!--- Start toggle right -->
+                    <div class="toggle-panel toggle-right center-flex tr-6s w-50">
+                        <h1>Hello, Friend</h1>
+                        <p class="fs-14">Register with your personal details to use the shipping system</p>
+                        <button class="hidden fs-14" id="register">SIGN UP</button>
+                    </div>
+                    <!--- End toggle left -->
+                </div>
+            </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

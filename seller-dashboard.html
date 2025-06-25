@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Dashboard | Shipping System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #1976d2;
+            --primary-light: #e8f0fe;
+            --accent-color: #4a89dc;
+            --text-color: #333;
+            --light-text: #666;
+            --white: #fff;
+            --border-radius: 10px;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            background-color: var(--white);
+            box-shadow: var(--box-shadow);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            padding: 1rem;
+        }
+        
+        .sidebar .logo {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .sidebar .logo img {
+            width: 40px;
+            margin-right: 10px;
+        }
+        
+        .sidebar .logo h2 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .sidebar .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--light-text);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar .menu-item.active,
+        .sidebar .menu-item:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+        
+        .sidebar .menu-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+        }
+        
+        .navbar {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 0.5rem 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .navbar .search-container {
+            position: relative;
+            width: 300px;
+        }
+        
+        .navbar .search-container input {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            padding-left: 2.5rem;
+            border-radius: 20px;
+            border: 1px solid #e0e0e0;
+            background-color: #f5f5f5;
+            outline: none;
+        }
+        
+        .navbar .search-container i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--light-text);
+        }
+        
+        .navbar .right-icons {
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar .right-icons .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-left: 1rem;
+            color: var(--light-text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .right-icons .icon-btn:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+        
+        .navbar .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-left: 1rem;
+            object-fit: cover;
+        }
+        
+        .card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 1.5rem;
+            border: none;
+            padding: 1.5rem;
+        }
+        
+        .card-title {
+            color: var(--text-color);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stats-card .value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stats-card .trend {
+            display: flex;
+            align-items: center;
+            color: #4caf50;
+            font-size: 0.9rem;
+        }
+        
+        .stats-card .trend i {
+            margin-right: 5px;
+        }
+        
+        .table-responsive {
+            margin-top: 1rem;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        .table th {
+            font-weight: 600;
+            color: var(--light-text);
+            border: none;
+            padding: 0.75rem;
+        }
+        
+        .table td {
+            border: none;
+            padding: 0.75rem;
+            vertical-align: middle;
+        }
+        
+        .table tbody tr {
+            transition: all 0.3s ease;
+        }
+        
+        .table tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .table .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            border-radius: 4px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-shipped {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .status-processing {
+            background-color: #fff8e1;
+            color: #ffa000;
+        }
+        
+        .status-delivered {
+            background-color: #e8f5e9;
+            color: #4caf50;
+        }
+        
+        .status-cancelled {
+            background-color: #fce4ec;
+            color: #e91e63;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <img src="https://via.placeholder.com/40/1976d2/ffffff?text=F" alt="Logo">
+            <h2>Circle Code</h2>
+        </div>
+        
+        <a href="#" class="menu-item active">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>Dashboard</span>
+        </a>
+        
+        <a href="#" class="menu-item">
+            <i class="fas fa-plus-circle"></i>
+            <span>Create Shipment</span>
+        </a>
+        
+        <a href="#" class="menu-item">
+            <i class="fas fa-shipping-fast"></i>
+            <span>My Shipments</span>
+        </a>
+        
+        <a href="#" class="menu-item">
+            <i class="fas fa-wallet"></i>
+            <span>Wallet</span>
+        </a>
+        
+        <a href="#" class="menu-item">
+            <i class="fas fa-user-circle"></i>
+            <span>Profile</span>
+        </a>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Navbar -->
+        <div class="navbar d-flex justify-content-between align-items-center">
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search...">
+            </div>
+            
+            <div class="right-icons">
+                <div class="icon-btn">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <div class="icon-btn">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle">3</span>
+                </div>
+                <div class="icon-btn">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <img src="https://via.placeholder.com/40/1976d2/ffffff?text=S" alt="Avatar" class="avatar">
+            </div>
+        </div>
+        
+        <!-- Dashboard Content -->
+        <div class="row">
+            <!-- Stats Cards Row -->
+            <div class="col-md-4 mb-4">
+                <div class="card stats-card">
+                    <div class="card-title">
+                        <span>Total Sales</span>
+                    </div>
+                    <div class="value">$24,598</div>
+                    <div class="trend">
+                        <i class="fas fa-arrow-up"></i> 
+                        <span>+8.4% this month</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card stats-card">
+                    <div class="card-title">
+                        <span>Total Orders</span>
+                    </div>
+                    <div class="value">1,235</div>
+                    <div class="trend">
+                        <i class="fas fa-arrow-up"></i> 
+                        <span>+12.2% this month</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card stats-card">
+                    <div class="card-title">
+                        <span>Total Products</span>
+                    </div>
+                    <div class="value">436</div>
+                    <div class="trend">
+                        <i class="fas fa-arrow-up"></i> 
+                        <span>+5.7% this month</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sales Chart -->
+            <div class="col-md-8 mb-4">
+                <div class="card">
+                    <div class="card-title">
+                        <span>Sales Overview</span>
+                        <div class="dropdown">
+                            <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="salesPeriod" data-bs-toggle="dropdown">
+                                Last 30 days
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Last 7 days</a></li>
+                                <li><a class="dropdown-item" href="#">Last 30 days</a></li>
+                                <li><a class="dropdown-item" href="#">Last 90 days</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="chart-container" style="height: 250px;">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Top Products -->
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-title">
+                        <span>Top Products</span>
+                        <div class="dropdown">
+                            <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="productFilter" data-bs-toggle="dropdown">
+                                This Month
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">This Week</a></li>
+                                <li><a class="dropdown-item" href="#">This Month</a></li>
+                                <li><a class="dropdown-item" href="#">This Year</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3" style="width: 40px; height: 40px; background-color: #e3f2fd; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-box text-primary"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">Product A</div>
+                                                <div class="text-muted small">Electronics</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="fw-bold">$1,458</div>
+                                        <div class="text-success small">+12.6%</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3" style="width: 40px; height: 40px; background-color: #e8f5e9; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-box text-success"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">Product B</div>
+                                                <div class="text-muted small">Fashion</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="fw-bold">$985</div>
+                                        <div class="text-success small">+8.2%</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3" style="width: 40px; height: 40px; background-color: #fff8e1; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-box text-warning"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">Product C</div>
+                                                <div class="text-muted small">Home & Garden</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="fw-bold">$745</div>
+                                        <div class="text-danger small">-2.6%</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Orders -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-title">
+                        <span>Recent Orders</span>
+                        <button class="btn btn-primary btn-sm">View All</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#ORD-7652</td>
+                                    <td>John Doe</td>
+                                    <td>Jul 25, 2023</td>
+                                    <td>$256.95</td>
+                                    <td><span class="status status-shipped">Shipped</span></td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-light btn-sm" type="button" id="orderAction1" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#">View</a></li>
+                                                <li><a class="dropdown-item" href="#">Edit</a></li>
+                                                <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#ORD-7651</td>
+                                    <td>Jane Smith</td>
+                                    <td>Jul 24, 2023</td>
+                                    <td>$198.00</td>
+                                    <td><span class="status status-processing">Processing</span></td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-light btn-sm" type="button" id="orderAction2" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#">View</a></li>
+                                                <li><a class="dropdown-item" href="#">Edit</a></li>
+                                                <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#ORD-7650</td>
+                                    <td>Robert Johnson</td>
+                                    <td>Jul 23, 2023</td>
+                                    <td>$325.25</td>
+                                    <td><span class="status status-delivered">Delivered</span></td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-light btn-sm" type="button" id="orderAction3" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#">View</a></li>
+                                                <li><a class="dropdown-item" href="#">Edit</a></li>
+                                                <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#ORD-7649</td>
+                                    <td>Sarah Williams</td>
+                                    <td>Jul 22, 2023</td>
+                                    <td>$145.80</td>
+                                    <td><span class="status status-cancelled">Cancelled</span></td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-light btn-sm" type="button" id="orderAction4" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#">View</a></li>
+                                                <li><a class="dropdown-item" href="#">Edit</a></li>
+                                                <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#ORD-7648</td>
+                                    <td>Michael Brown</td>
+                                    <td>Jul 21, 2023</td>
+                                    <td>$289.50</td>
+                                    <td><span class="status status-shipped">Shipped</span></td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-light btn-sm" type="button" id="orderAction5" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#">View</a></li>
+                                                <li><a class="dropdown-item" href="#">Edit</a></li>
+                                                <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            
+            if (!currentUser || currentUser.role !== 'seller') {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Sales Chart
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            const salesChart = new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1', '5', '10', '15', '20', '25', '30'],
+                    datasets: [{
+                        label: 'Sales',
+                        data: [5000, 7000, 4500, 6800, 5900, 9000, 8200],
+                        backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                        borderColor: '#1976d2',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#fff',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                borderDash: [5, 5]
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

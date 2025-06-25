@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Dashboard | Shipping System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #1976d2;
+            --primary-light: #e8f0fe;
+            --accent-color: #4a89dc;
+            --text-color: #333;
+            --light-text: #666;
+            --white: #fff;
+            --border-radius: 10px;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            background-color: var(--white);
+            box-shadow: var(--box-shadow);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            padding: 1rem;
+        }
+        
+        .sidebar .logo {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .sidebar .logo img {
+            width: 40px;
+            margin-right: 10px;
+        }
+        
+        .sidebar .logo h2 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .sidebar .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--light-text);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar .menu-item.active,
+        .sidebar .menu-item:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+        
+        .sidebar .menu-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+        }
+        
+        .navbar {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 0.5rem 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .navbar .search-container {
+            position: relative;
+            width: 300px;
+        }
+        
+        .navbar .search-container input {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            padding-left: 2.5rem;
+            border-radius: 20px;
+            border: 1px solid #e0e0e0;
+            background-color: #f5f5f5;
+            outline: none;
+        }
+        
+        .navbar .search-container i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--light-text);
+        }
+        
+        .navbar .right-icons {
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar .right-icons .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-left: 1rem;
+            color: var(--light-text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .right-icons .icon-btn:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+        
+        .navbar .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-left: 1rem;
+            object-fit: cover;
+        }
+        
+        .card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 1.5rem;
+            border: none;
+            padding: 1.5rem;
+        }
+        
+        .card-title {
+            color: var(--text-color);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stats-card .value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stats-card .trend {
+            display: flex;
+            align-items: center;
+            color: #4caf50;
+            font-size: 0.9rem;
+        }
+        
+        .stats-card .trend.down {
+            color: #f44336;
+        }
+        
+        .stats-card .trend i {
+            margin-right: 5px;
+        }
+        
+        .table-responsive {
+            margin-top: 1rem;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        .table th {
+            font-weight: 600;
+            color: var(--light-text);
+            border: none;
+            padding: 0.75rem;
+        }
+        
+        .table td {
+            border: none;
+            padding: 0.75rem;
+            vertical-align: middle;
+        }
+        
+        .table tbody tr {
+            transition: all 0.3s ease;
+        }
+        
+        .table tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-shipped {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .status-processing {
+            background-color: #fff8e1;
+            color: #ffa000;
+        }
+        
+        .status-delivered {
+            background-color: #e8f5e9;
+            color: #4caf50;
+        }
+        
+        .status-cancelled {
+            background-color: #fce4ec;
+            color: #e91e63;
+        }
+        
+        .map-container {
+            height: 400px;
+            position: relative;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+        
+        .map-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .delivery-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .delivery-item:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .delivery-item .icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 1rem;
+            color: var(--primary-color);
+        }
+        
+        .delivery-item .info {
+            flex: 1;
+        }
+        
+        .delivery-item .info .title {
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.25rem;
+        }
+        
+        .delivery-item .info .details {
+            color: var(--light-text);
+            font-size: 0.85rem;
+        }
+        
+        .delivery-item .action {
+            margin-left: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <img src="https://via.placeholder.com/40/1976d2/ffffff?text=F" alt="Logo">
+            <h2>Circle Code</h2>
+        </div>
+        
+        <a href="#" class="menu-item active">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>Dashboard</span>
+        </a>
+        
+        <a href="#" class="menu-item">
+            <i class="fas fa-truck"></i>
+            <span>My Delivery</span>
+        </a>
+        
+        <a href="#" class="menu-item">
+            <i class="fas fa-wallet"></i>
+            <span>Wallet</span>
+        </a>
+        
+        <a href="#" class="menu-item">
+            <i class="fas fa-user-circle"></i>
+            <span>Profile</span>
+        </a>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Navbar -->
+        <div class="navbar d-flex justify-content-between align-items-center">
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search...">
+            </div>
+            
+            <div class="right-icons">
+                <div class="icon-btn">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <div class="icon-btn">
+                    <i class="fas fa-truck"></i>
+                    <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle">5</span>
+                </div>
+                <div class="icon-btn">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <img src="https://via.placeholder.com/40/1976d2/ffffff?text=A" alt="Avatar" class="avatar">
+            </div>
+        </div>
+        
+        <!-- Dashboard Content -->
+        <div class="row">
+            <!-- Stats Cards Row -->
+            <div class="col-md-3 mb-4">
+                <div class="card stats-card">
+                    <div class="card-title">
+                        <span>Total Deliveries</span>
+                    </div>
+                    <div class="value">124</div>
+                    <div class="trend">
+                        <i class="fas fa-arrow-up"></i> 
+                        <span>+8.4% this week</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card stats-card">
+                    <div class="card-title">
+                        <span>Completed</span>
+                    </div>
+                    <div class="value">98</div>
+                    <div class="trend">
+                        <i class="fas fa-arrow-up"></i> 
+                        <span>+12.2% this week</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card stats-card">
+                    <div class="card-title">
+                        <span>In Transit</span>
+                    </div>
+                    <div class="value">18</div>
+                    <div class="trend down">
+                        <i class="fas fa-arrow-down"></i> 
+                        <span>-2.8% this week</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card stats-card">
+                    <div class="card-title">
+                        <span>Failed</span>
+                    </div>
+                    <div class="value">8</div>
+                    <div class="trend down">
+                        <i class="fas fa-arrow-down"></i> 
+                        <span>-1.4% this week</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Delivery Map -->
+            <div class="col-md-8 mb-4">
+                <div class="card">
+                    <div class="card-title">
+                        <span>Delivery Map</span>
+                        <div class="dropdown">
+                            <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="mapFilter" data-bs-toggle="dropdown">
+                                Today's Routes
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Today's Routes</a></li>
+                                <li><a class="dropdown-item" href="#">This Week</a></li>
+                                <li><a class="dropdown-item" href="#">All Active</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="map-container">
+                        <img src="https://via.placeholder.com/800x400/e3f2fd/1976d2?text=Delivery+Map" alt="Delivery Map">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Today's Deliveries -->
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-title">
+                        <span>Today's Deliveries</span>
+                        <button class="btn btn-primary btn-sm">View All</button>
+                    </div>
+                    <div>
+                        <div class="delivery-item">
+                            <div class="icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="info">
+                                <div class="title">Order #7652</div>
+                                <div class="details">123 Main St, New York</div>
+                                <div class="details">Estimated: 9:30 AM</div>
+                            </div>
+                            <div class="action">
+                                <button class="btn btn-light btn-sm"><i class="fas fa-arrow-right"></i></button>
+                            </div>
+                        </div>
+                        <div class="delivery-item">
+                            <div class="icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="info">
+                                <div class="title">Order #7653</div>
+                                <div class="details">456 Oak Ave, New York</div>
+                                <div class="details">Estimated: 10:15 AM</div>
+                            </div>
+                            <div class="action">
+                                <button class="btn btn-light btn-sm"><i class="fas fa-arrow-right"></i></button>
+                            </div>
+                        </div>
+                        <div class="delivery-item">
+                            <div class="icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="info">
+                                <div class="title">Order #7654</div>
+                                <div class="details">789 Pine Rd, New York</div>
+                                <div class="details">Estimated: 11:45 AM</div>
+                            </div>
+                            <div class="action">
+                                <button class="btn btn-light btn-sm"><i class="fas fa-arrow-right"></i></button>
+                            </div>
+                        </div>
+                        <div class="delivery-item">
+                            <div class="icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="info">
+                                <div class="title">Order #7655</div>
+                                <div class="details">101 Cedar Ln, New York</div>
+                                <div class="details">Estimated: 1:30 PM</div>
+                            </div>
+                            <div class="action">
+                                <button class="btn btn-light btn-sm"><i class="fas fa-arrow-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Deliveries -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-title">
+                        <span>Recent Deliveries</span>
+                        <button class="btn btn-primary btn-sm">View All</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Address</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#ORD-7652</td>
+                                    <td>John Doe</td>
+                                    <td>123 Main St, New York</td>
+                                    <td>Jul 25, 2023</td>
+                                    <td><span class="status status-delivered">Delivered</span></td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-light btn-sm" type="button" id="deliveryAction1" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#">View Details</a></li>
+                                                <li><a class="dropdown-item" href="#">View Route</a></li>
+                                                <li><a class="dropdown-item" href="#">Print Receipt</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#ORD-7651</td>
+                                    <td>Jane Smith</td>
+                                    <td>456 Oak Ave, New York</td>
+                                    <td>Jul 24, 2023</td>
+                                    <td><span class="status status-shipped">In Transit</span></td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-light btn-sm" type="button" id="deliveryAction2" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#">View Details</a></li>
+                                                <li><a class="dropdown-item" href="#">View Route</a></li>
+                                                <li><a class="dropdown-item" href="#">Update Status</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#ORD-7650</td>
+                                    <td>Robert Johnson</td>
+                                    <td>789 Pine Rd, New York</td>
+                                    <td>Jul 23, 2023</td>
+                                    <td><span class="status status-delivered">Delivered</span></td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-light btn-sm" type="button" id="deliveryAction3" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#">View Details</a></li>
+                                                <li><a class="dropdown-item" href="#">View Route</a></li>
+                                                <li><a class="dropdown-item" href="#">Print Receipt</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#ORD-7649</td>
+                                    <td>Sarah Williams</td>
+                                    <td>101 Cedar Ln, New York</td>
+                                    <td>Jul 22, 2023</td>
+                                    <td><span class="status status-cancelled">Failed</span></td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-light btn-sm" type="button" id="deliveryAction4" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#">View Details</a></li>
+                                                <li><a class="dropdown-item" href="#">Reschedule</a></li>
+                                                <li><a class="dropdown-item" href="#">Contact Customer</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            
+            if (!currentUser || currentUser.role !== 'agent') {
+                window.location.href = 'index.html';
+                return;
+            }
+        });
+    </script>
+</body>
+</html> 

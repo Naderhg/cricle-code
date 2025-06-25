@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Shipping System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #1976d2;
+            --primary-light: #e8f0fe;
+            --accent-color: #4a89dc;
+            --text-color: #333;
+            --light-text: #666;
+            --white: #fff;
+            --border-radius: 10px;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            background-color: var(--white);
+            box-shadow: var(--box-shadow);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            padding: 1rem;
+        }
+        
+        .sidebar .logo {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .sidebar .logo img {
+            width: 40px;
+            margin-right: 10px;
+        }
+        
+        .sidebar .logo h2 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .sidebar .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--light-text);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar .menu-item.active,
+        .sidebar .menu-item:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+        
+        .sidebar .menu-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+        }
+        
+        .navbar {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 0.5rem 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .navbar .search-container {
+            position: relative;
+            width: 300px;
+        }
+        
+        .navbar .search-container input {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            padding-left: 2.5rem;
+            border-radius: 20px;
+            border: 1px solid #e0e0e0;
+            background-color: #f5f5f5;
+            outline: none;
+        }
+        
+        .navbar .search-container i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--light-text);
+        }
+        
+        .navbar .right-icons {
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar .right-icons .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-left: 1rem;
+            color: var(--light-text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .right-icons .icon-btn:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+        
+        .navbar .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-left: 1rem;
+            object-fit: cover;
+        }
+        
+        .card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 1.5rem;
+            border: none;
+            padding: 1.5rem;
+        }
+        
+        .card-title {
+            color: var(--text-color);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-title i {
+            color: var(--light-text);
+            cursor: pointer;
+        }
+        
+        .stats-card .value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stats-card .trend {
+            display: flex;
+            align-items: center;
+            color: #4caf50;
+            font-size: 0.9rem;
+        }
+        
+        .stats-card .trend.down {
+            color: #f44336;
+        }
+        
+        .stats-card .trend i {
+            margin-right: 5px;
+        }
+        
+        .market-share-chart {
+            position: relative;
+            height: 200px;
+            width: 200px;
+            margin: 0 auto;
+        }
+        
+        .market-share-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .market-share-list {
+            margin-top: 1rem;
+        }
+        
+        .market-share-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .market-share-item .name {
+            display: flex;
+            align-items: center;
+        }
+        
+        .market-share-item .color-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .weather-card {
+            text-align: center;
+        }
+        
+        .weather-card .icon {
+            font-size: 3rem;
+            color: #ffc107;
+            margin-bottom: 0.5rem;
+        }
+        
+        .weather-card .temp {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+        
+        .weather-card .location,
+        .weather-card .condition,
+        .weather-card .high-low {
+            color: var(--light-text);
+            margin-bottom: 0.25rem;
+        }
+        
+        .project-list {
+            margin-top: 1rem;
+        }
+        
+        .project-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .project-item .avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+        
+        .project-item .info {
+            flex: 1;
+        }
+        
+        .project-item .info .name {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .project-item .info .progress {
+            height: 6px;
+            margin-top: 0.5rem;
+        }
+        
+        .project-item .info .progress-bar {
+            background-color: var(--primary-color);
+        }
+        
+        .project-item .time {
+            color: var(--light-text);
+            font-size: 0.9rem;
+            margin-left: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <img src="https://via.placeholder.com/40/1976d2/ffffff?text=F" alt="Logo">
+            <h2>Circle Code Team</h2>
+        </div>
+        
+        <a href="#" class="menu-item active">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>Dashboard</span>
+        </a>
+        
+        <a href="#" class="menu-item">
+            <i class="fas fa-users"></i>
+            <span>Sellers</span>
+        </a>
+        
+        <a href="#" class="menu-item">
+            <i class="fas fa-user-tie"></i>
+            <span>Agents</span>
+        </a>
+        
+        <a href="#" class="menu-item">
+            <i class="fas fa-shipping-fast"></i>
+            <span>Shipments</span>
+        </a>
+        
+        <a href="#" class="menu-item">
+            <i class="fas fa-wallet"></i>
+            <span>Wallet</span>
+        </a>
+        
+        <a href="#" class="menu-item">
+            <i class="fas fa-map-marked-alt"></i>
+            <span>Zones</span>
+        </a>
+        
+        <a href="#" class="menu-item">
+            <i class="fas fa-user-shield"></i>
+            <span>Admins</span>
+        </a>
+        
+        <a href="#" class="menu-item">
+            <i class="fas fa-user-circle"></i>
+            <span>Profile</span>
+        </a>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Navbar -->
+        <div class="navbar d-flex justify-content-between align-items-center">
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search...">
+            </div>
+            
+            <div class="right-icons">
+                <div class="icon-btn">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <div class="icon-btn">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle">3</span>
+                </div>
+                <div class="icon-btn">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <img src="https://via.placeholder.com/40/1976d2/ffffff?text=A" alt="Avatar" class="avatar">
+            </div>
+        </div>
+        
+        <!-- Dashboard Content -->
+        <div class="row">
+            <!-- Weekly Sales -->
+            <div class="col-md-6 mb-4">
+                <div class="card stats-card">
+                    <div class="card-title">
+                        <span>Weekly Sales</span>
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="value">$47K</div>
+                    <div class="trend">
+                        <i class="fas fa-arrow-up"></i> 
+                        <span>+3.5%</span>
+                    </div>
+                    <div class="chart-container mt-3" style="height: 100px;">
+                        <canvas id="weeklySalesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Total Orders -->
+            <div class="col-md-6 mb-4">
+                <div class="card stats-card">
+                    <div class="card-title">
+                        <span>Total Order</span>
+                    </div>
+                    <div class="value">58.4K</div>
+                    <div class="trend">
+                        <i class="fas fa-arrow-up"></i> 
+                        <span>+13.6%</span>
+                    </div>
+                    <div class="chart-container mt-3" style="height: 100px;">
+                        <canvas id="totalOrdersChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Market Share -->
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-title">
+                        <span>Market Share</span>
+                    </div>
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="market-share-chart">
+                                <canvas id="marketShareChart"></canvas>
+                                <div class="market-share-value">26M</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="market-share-list">
+                                <div class="market-share-item">
+                                    <div class="name">
+                                        <div class="color-dot" style="background-color: #1976d2;"></div>
+                                        <span>Samsung</span>
+                                    </div>
+                                    <div class="value">58%</div>
+                                </div>
+                                <div class="market-share-item">
+                                    <div class="name">
+                                        <div class="color-dot" style="background-color: #4fc3f7;"></div>
+                                        <span>Huawei</span>
+                                    </div>
+                                    <div class="value">21%</div>
+                                </div>
+                                <div class="market-share-item">
+                                    <div class="name">
+                                        <div class="color-dot" style="background-color: #ff9800;"></div>
+                                        <span>Apple</span>
+                                    </div>
+                                    <div class="value">22%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Weather -->
+            <div class="col-md-6 mb-4">
+                <div class="card weather-card">
+                    <div class="card-title">
+                        <span>Weather</span>
+                        <i class="fas fa-ellipsis-h"></i>
+                    </div>
+                    <i class="fas fa-sun icon"></i>
+                    <div class="temp">31°</div>
+                    <div class="location">New York City</div>
+                    <div class="condition">Sunny</div>
+                    <div class="high-low">32° / 25°</div>
+                    <div class="precipitation">Precipitation: 50%</div>
+                </div>
+            </div>
+            
+            <!-- Running Projects -->
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-title">
+                        <span>Running Projects</span>
+                        <div class="dropdown">
+                            <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="projectFilter" data-bs-toggle="dropdown">
+                                Working Time
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">All</a></li>
+                                <li><a class="dropdown-item" href="#">Completed</a></li>
+                                <li><a class="dropdown-item" href="#">In Progress</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="project-list">
+                        <div class="project-item">
+                            <div class="avatar bg-primary-light text-primary">F</div>
+                            <div class="info">
+                                <div class="name">Circle Code</div>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width: 90%" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                            <div class="time">58:20:00</div>
+                        </div>
+                        <div class="project-item">
+                            <div class="avatar" style="background: #e8f5e9; color: #4caf50;">R</div>
+                            <div class="info">
+                                <div class="name">Reign</div>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width: 78%" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                            <div class="time">31:50:00</div>
+                        </div>
+                        <div class="project-item">
+                            <div class="avatar" style="background: #e3f2fd; color: #2196f3;">B</div>
+                            <div class="info">
+                                <div class="name">Boots4</div>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width: 79%" aria-valuenow="79" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                            <div class="time">25:20:00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Total Sales -->
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-title">
+                        <span>Total Sales</span>
+                        <div class="dropdown">
+                            <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="salesPeriod" data-bs-toggle="dropdown">
+                                January
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">January</a></li>
+                                <li><a class="dropdown-item" href="#">February</a></li>
+                                <li><a class="dropdown-item" href="#">March</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="chart-container" style="height: 250px;">
+                        <canvas id="totalSalesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            
+            if (!currentUser || currentUser.role !== 'admin') {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Weekly Sales Chart
+            const weeklySalesCtx = document.getElementById('weeklySalesChart').getContext('2d');
+            const weeklySalesChart = new Chart(weeklySalesCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Weekly Sales',
+                        data: [12, 19, 17, 9, 13, 17, 15],
+                        backgroundColor: '#1976d2',
+                        borderColor: '#1976d2',
+                        borderWidth: 1,
+                        borderRadius: 5,
+                        maxBarThickness: 10
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            display: false
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+            
+            // Total Orders Chart
+            const totalOrdersCtx = document.getElementById('totalOrdersChart').getContext('2d');
+            const totalOrdersChart = new Chart(totalOrdersCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Total Orders',
+                        data: [12, 15, 18, 25, 30, 45],
+                        backgroundColor: 'transparent',
+                        borderColor: '#1976d2',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#fff',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            display: false
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+            
+            // Market Share Chart
+            const marketShareCtx = document.getElementById('marketShareChart').getContext('2d');
+            const marketShareChart = new Chart(marketShareCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Samsung', 'Huawei', 'Apple'],
+                    datasets: [{
+                        data: [58, 21, 22],
+                        backgroundColor: [
+                            '#1976d2',
+                            '#4fc3f7',
+                            '#ff9800'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    cutout: '75%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+            
+            // Total Sales Chart
+            const totalSalesCtx = document.getElementById('totalSalesChart').getContext('2d');
+            const totalSalesChart = new Chart(totalSalesCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'Total Sales',
+                        data: [65, 85, 60, 80, 65, 90, 85, 125, 100, 85, 90, 130],
+                        backgroundColor: 'transparent',
+                        borderColor: '#1976d2',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#1976d2',
+                        pointRadius: 4,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
